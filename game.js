@@ -47,10 +47,10 @@ class Game {
     
     setupCanvas() {
         const resizeCanvas = () => {
-            const container = document.getElementById('gameContainer');
-            const rect = container.getBoundingClientRect();
+            const gameArea = document.querySelector('.game-area');
+            const rect = gameArea.getBoundingClientRect();
             
-            // Устанавливаем размер канваса равным размеру контейнера
+            // Устанавливаем размер канваса равным размеру игровой области
             this.canvas.width = rect.width;
             this.canvas.height = rect.height;
             
