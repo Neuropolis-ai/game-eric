@@ -136,14 +136,21 @@ class Game {
         setupMobileControl('attackBtn', 'attack');
         
         // Кнопки экранов
-        document.getElementById('startGameBtn').addEventListener('click', () => this.startGame());
+        document.getElementById('startGameBtn').addEventListener('click', () => {
+            console.log("Start Game button clicked!");
+            this.startGame();
+        });
         document.getElementById('restartBtn').addEventListener('click', () => this.restartGame());
         document.getElementById('playAgainBtn').addEventListener('click', () => this.restartGame());
     }
     
     startGame() {
+        if (this.gameState === 'playing') return;
+        console.log("Starting game...");
         this.gameState = 'playing';
         document.getElementById('welcomeScreen').classList.add('hidden');
+        document.getElementById('gameOverScreen').classList.add('hidden');
+        document.getElementById('victoryScreen').classList.add('hidden');
         this.setupLevel();
     }
     
