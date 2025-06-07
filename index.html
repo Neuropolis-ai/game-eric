@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Эрик зовёт на шашлык</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- Telegram Web App Script -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1>🔥 Эрик зовёт на шашлык 🔥</h1>
+            <div class="game-info">
+                <div class="health">❤️ <span id="health">3</span></div>
+                <div class="score">🥩 <span id="score">0</span></div>
+                <div class="level">Уровень: <span id="level">1</span></div>
+            </div>
+        </div>
+        
+        <canvas id="gameCanvas"></canvas>
+        
+        <div class="mobile-controls">
+            <div class="control-row">
+                <button id="leftBtn" class="control-btn">⬅️</button>
+                <button id="jumpBtn" class="control-btn jump-btn">⬆️</button>
+                <button id="rightBtn" class="control-btn">➡️</button>
+            </div>
+            <div class="control-row">
+                <button id="attackBtn" class="control-btn attack-btn">🍖</button>
+            </div>
+        </div>
+        
+        <div id="gameOverScreen" class="screen hidden">
+            <h2>Игра окончена!</h2>
+            <p>Не получилось собрать друзей на шашлыки... 😢</p>
+            <button id="restartBtn">Начать заново</button>
+        </div>
+        
+        <div id="victoryScreen" class="screen hidden">
+            <h2>🔥 Шашлык удался! Все в сборе! 🔥</h2>
+            <p>Поздравляем! Ты помог Эрику собрать всех друзей:</p>
+            <p>🚬 Влад: "Ладно, только после плюшки!"</p>
+            <p>🍺 Макс: "Окей, но с пивом заеду"</p>
+            <p>💻 Марк: "Ну ладно, отвлекусь от работы"</p>
+            <p>🪖 Ден: "Если командир отпустит — приду!"</p>
+            <button id="playAgainBtn">Играть снова</button>
+        </div>
+        
+        <div id="startScreen" class="screen">
+            <h2>🎮 Добро пожаловать! 🎮</h2>
+            <p>Помоги Эрику собрать всех друзей на шашлыки!</p>
+            <div class="game-story">
+                <p>📖 <strong>Сюжет:</strong></p>
+                <p>Эрик очень хочет собрать друзей на шашлыки, но каждый из них занят: Влад курит плюшки, Макс пьёт пиво, Марк работает, а Ден служит в армии. Пройди 4 уровня и переубеди всех!</p>
+            </div>
+            <div class="controls-info">
+                <p>🎮 <strong>Управление:</strong></p>
+                <p>⬅️➡️ - Движение<br>⬆️ - Прыжок<br>🍖 - Угостить шашлыком</p>
+            </div>
+            <button id="startBtn">🔥 Начать игру 🔥</button>
+        </div>
+    </div>
+
+    <!-- Подключение скриптов -->
+    <script src="telegram-web-app.js"></script>
+    <script src="game.js"></script>
+</body>
+</html> 
