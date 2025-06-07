@@ -218,9 +218,9 @@ class Game {
         // Создание платформ
         this.createPlatforms();
         
-        // Создание босса - ИСПРАВЛЕНО: позиционирование в центре экрана
+        // Создание босса - позиционирование ниже центра для лучшего попадания в игрока
         const bossInfo = this.bossData[this.currentLevel];
-        this.boss = new Boss(this.canvas.width - 120, this.canvas.height / 2 - 25, bossInfo);
+        this.boss = new Boss(this.canvas.width - 120, this.canvas.height * 0.65 - 25, bossInfo);
         
         // Сброс позиции игрока
         this.player.x = 50;
