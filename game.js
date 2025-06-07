@@ -42,6 +42,10 @@ class Game {
             4: { name: 'Ден', emoji: '🪖', quote: 'Если командир отпустит — сразу лечу! Служу России! 🫡', weapon: '🎖️' }
         };
         
+        // Telegram Web App интеграция
+        this.telegramApp = null;
+        this.initTelegramIntegration();
+        
         this.init();
     }
     
@@ -72,6 +76,61 @@ class Game {
     init() {
         this.setupEventListeners();
         this.gameLoop();
+    }
+    
+    initTelegramIntegration() {
+        // Инициализация Telegram Web App API
+        if (window.TelegramWebApp) {
+            this.telegramApp = new TelegramWebApp();
+            console.log('Telegram Web App интеграция активирована');
+        } else if (window.Telegram?.WebApp) {
+            this.telegramApp = window.Telegram.WebApp;
+            this.telegramApp.ready();
+            this.telegramApp.expand();
+            console.log('Telegram Web App API найдено');
+        } else {
+            console.log('Telegram Web App API не найдено - локальный режим');
+        }
+    }
+    
+    sendGameResult(victory = false) {
+        // Отправка результатов в Telegram бот
+        if (this.telegramApp && this.telegramApp.sendGameResult) {
+            this.telegramApp.sendGameResult(this.currentLevel, this.score, victory);
+        } else if (this.telegramApp && this.telegramApp.sendData) {
+            const resultData = {
+                action: 'game_result',
+                level: this.currentLevel,
+                score: this.score,
+                victory: victory,
+                timestamp: Date.now()
+            };
+            this.telegramApp.sendData(JSON.stringify(resultData));
+        }
+        
+        // Вибрация
+        if (this.telegramApp && this.telegramApp.hapticFeedback) {
+            this.telegramApp.hapticFeedback(victory ? 'success' : 'error');
+        }
+    }
+    
+    sendLevelComplete() {
+        // Отправка данных о прохождении уровня
+        if (this.telegramApp && this.telegramApp.sendData) {
+            const levelData = {
+                action: 'level_complete',
+                level: this.currentLevel,
+                score: this.score,
+                victory: true,
+                timestamp: Date.now()
+            };
+            this.telegramApp.sendData(JSON.stringify(levelData));
+        }
+        
+        // Вибрация успеха
+        if (this.telegramApp && this.telegramApp.hapticFeedback) {
+            this.telegramApp.hapticFeedback('success');
+        }
     }
     
     setupEventListeners() {
@@ -371,6 +430,9 @@ class Game {
                 // Временно блокируем игрока для предотвращения повторных атак
                 this.gameState = 'levelTransition';
                 
+                // Отправляем результат прохождения уровня
+                this.sendLevelComplete();
+                
                 // Показываем смешное сообщение босса
                 this.showBossMessage();
                 
@@ -426,6 +488,8 @@ class Game {
             this.gameState = 'gameOver';
             // Скрываем мобильные кнопки управления
             this.hideMobileControls();
+            // Отправляем результат поражения
+            this.sendGameResult(false);
             document.getElementById('gameOverScreen').classList.remove('hidden');
         } else {
             // Респавн игрока - ИСПРАВЛЕНО: правильная позиция
@@ -446,6 +510,8 @@ class Game {
             this.gameState = 'victory';
             // Скрываем мобильные кнопки управления
             this.hideMobileControls();
+            // Отправляем результат полной победы
+            this.sendGameResult(true);
             document.getElementById('finalScore').textContent = this.score;
             document.getElementById('victoryScreen').classList.remove('hidden');
         } else {

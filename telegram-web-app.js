@@ -110,6 +110,7 @@ class TelegramWebApp {
             username: this.tg.initDataUnsafe?.user?.username
         };
         
+        console.log('Отправка результата игры:', resultData);
         this.tg.sendData(JSON.stringify(resultData));
         
         // Показать главную кнопку при победе

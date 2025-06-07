@@ -121,6 +121,10 @@ class GameBot:
         @self.dp.callback_query()
         async def callback_handler(callback: CallbackQuery):
             await self.handle_callback(callback)
+            
+        @self.dp.message()
+        async def web_app_data_handler(message: Message):
+            await self.handle_web_app_data(message)
     
     async def handle_start(self, message: Message):
         """Обработчик команды /start"""
@@ -293,6 +297,56 @@ class GameBot:
         
         await callback.answer()
     
+    async def handle_web_app_data(self, message: Message):
+        """Обработчик данных от веб-приложения"""
+        if not message.web_app_data:
+            return
+        
+        try:
+            # Парсим данные от игры
+            data = json.loads(message.web_app_data.data)
+            action = data.get('action')
+            user_id = message.from_user.id
+            
+            if action == 'game_result':
+                level = data.get('level', 1)
+                score = data.get('score', 0)
+                victory = data.get('victory', False)
+                
+                self.save_game_result(user_id, level, score, victory)
+                
+                # Отправка поздравления при полной победе (все 4 уровня)
+                if victory and level >= 4:
+                    await send_victory_message(self.bot, user_id, score)
+            
+            elif action == 'level_complete':
+                level = data.get('level', 1)
+                score = data.get('score', 0)
+                victory = True
+                
+                # Сохраняем результат прохождения уровня
+                self.save_game_result(user_id, level, score, victory)
+                
+            elif action == 'share_result':
+                text = data.get('text', 'Я прошел игру "Эрик зовёт на шашлык"! 🔥')
+                
+                # Создание сообщения для шаринга
+                keyboard = InlineKeyboardBuilder()
+                keyboard.add(InlineKeyboardButton(
+                    text="🎮 Играть тоже!",
+                    web_app=WebAppInfo(url=GAME_URL)
+                ))
+                
+                await message.answer(
+                    f"{text}\n\nПопробуй и ты! 👇",
+                    reply_markup=keyboard.as_markup()
+                )
+        
+        except (json.JSONDecodeError, KeyError) as e:
+            logger.error(f"Error parsing web app data: {e}")
+        except Exception as e:
+            logger.error(f"Error handling web app data: {e}")
+    
     def register_user(self, user: types.User):
         """Регистрация пользователя в базе данных"""
         conn = sqlite3.connect('shashlik_game.db')
@@ -378,7 +432,7 @@ class GameBot:
         for level in range(1, 5):
             cursor.execute('''
                 SELECT COUNT(*) FROM game_results 
-                WHERE user_id = ? AND level >= ? AND victory = 1
+                WHERE user_id = ? AND level = ? AND victory = 1
             ''', (user_id, level))
             level_stats[level] = cursor.fetchone()[0]
         
@@ -438,22 +492,39 @@ async def game_data_handler(request):
     bot_instance = request.app["bot_instance"]
     
     try:
-        # Проверка данных Telegram Web App
-        data = await request.json()
-        init_data = data.get('init_data', '')
+        # Получение данных от Telegram Web App
+        raw_data = await request.text()
         
-        if not verify_telegram_data(init_data):
-            return web.json_response({'error': 'Invalid data'}, status=400)
+        # Данные могут приходить как строка JSON или как form data
+        try:
+            if raw_data.startswith('{'):
+                # JSON данные
+                data = json.loads(raw_data)
+            else:
+                # Form data или init_data строка
+                # Парсим данные из query string формата
+                import urllib.parse
+                parsed_data = urllib.parse.parse_qs(raw_data)
+                
+                # Извлекаем основные данные
+                if 'web_app_data' in parsed_data:
+                    web_app_data = json.loads(parsed_data['web_app_data'][0])
+                    data = json.loads(web_app_data.get('data', '{}'))
+                else:
+                    return web.json_response({'error': 'Invalid data format'}, status=400)
+        except (json.JSONDecodeError, KeyError):
+            return web.json_response({'error': 'Invalid JSON'}, status=400)
         
-        # Обработка игровых данных
-        game_data = data.get('game_data', {})
-        action = game_data.get('action')
+        action = data.get('action')
+        user_id = data.get('user_id')
+        
+        if not user_id:
+            return web.json_response({'error': 'Missing user_id'}, status=400)
         
         if action == 'game_result':
-            user_id = game_data['user_id']
-            level = game_data['level']
-            score = game_data['score']
-            victory = game_data['victory']
+            level = data.get('level', 1)
+            score = data.get('score', 0)
+            victory = data.get('victory', False)
             
             bot_instance.save_game_result(user_id, level, score, victory)
             
@@ -461,9 +532,16 @@ async def game_data_handler(request):
             if victory:
                 await send_victory_message(bot_instance.bot, user_id, score)
         
+        elif action == 'level_complete':
+            level = data.get('level', 1)
+            score = data.get('score', 0)
+            victory = data.get('victory', True)
+            
+            # Сохраняем результат прохождения уровня
+            bot_instance.save_game_result(user_id, level, score, victory)
+        
         elif action == 'share_result':
-            text = game_data.get('text', '')
-            user_id = game_data['user_id']
+            text = data.get('text', '')
             
             # Создание сообщения для шаринга
             keyboard = InlineKeyboardBuilder()
