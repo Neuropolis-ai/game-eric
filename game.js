@@ -36,10 +36,10 @@ class Game {
         
         // Босс-описания
         this.bossData = {
-            1: { name: 'Влад', emoji: '🚬', quote: 'Ладно, только после плюшки!', weapon: '💨' },
-            2: { name: 'Макс', emoji: '🍺', quote: 'Окей, но с пивом заеду', weapon: '🍻' },
-            3: { name: 'Марк', emoji: '💻', quote: 'Ну ладно, отвлекусь от работы', weapon: '📋' },
-            4: { name: 'Ден', emoji: '🪖', quote: 'Если командир отпустит — приду!', weapon: '🎖️' }
+            1: { name: 'Влад', emoji: '🚬', quote: 'Ладно, ладно! Только после этой плюшки дожую! 😤', weapon: '💨' },
+            2: { name: 'Макс', emoji: '🍺', quote: 'Ну окей, но с пивом заеду! Без пива не шашлык! 🍻', weapon: '🍻' },
+            3: { name: 'Марк', emoji: '💻', quote: 'Блин, ну ладно... Отвлекусь от этих багов! 🐛→🔥', weapon: '📋' },
+            4: { name: 'Ден', emoji: '🪖', quote: 'Если командир отпустит — сразу лечу! Служу России! 🫡', weapon: '🎖️' }
         };
         
         this.init();
@@ -259,16 +259,20 @@ class Game {
     }
     
     update() {
-        if (this.gameState !== 'playing') return;
+        if (this.gameState !== 'playing' && this.gameState !== 'levelTransition') return;
         
-        this.handleInput();
+        // Во время перехода между уровнями блокируем ввод
+        if (this.gameState === 'playing') {
+            this.handleInput();
+        }
+        
         this.player.update(this.platforms);
         
         if (this.boss) {
             this.boss.update(this.player);
             
             // Создание снарядов боссом - ОПТИМИЗИРОВАНО: реже создаем снаряды
-            if (Math.random() < 0.01 && this.projectiles.length < 3) {
+            if (Math.random() < 0.01 && this.projectiles.length < 3 && this.gameState === 'playing') {
                 this.projectiles.push(new Projectile(
                     this.boss.x, 
                     this.boss.y + 20, 
@@ -338,7 +342,7 @@ class Game {
     }
     
     checkBossAttack() {
-        if (!this.boss) return;
+        if (!this.boss || this.boss.health <= 0) return; // Защита от повторных атак
         
         const distance = Math.abs(this.player.x - this.boss.x);
         if (distance < 80) {
@@ -347,9 +351,54 @@ class Game {
             this.score += 50;
             
             if (this.boss.health <= 0) {
-                this.nextLevel();
+                // Временно блокируем игрока для предотвращения повторных атак
+                this.gameState = 'levelTransition';
+                
+                // Показываем смешное сообщение босса
+                this.showBossMessage();
+                
+                // Задержка перед переходом на следующий уровень
+                setTimeout(() => {
+                    this.nextLevel();
+                }, 2000);
             }
         }
+    }
+    
+    showBossMessage() {
+        const bossInfo = this.bossData[this.currentLevel];
+        
+        // Создаем временное сообщение
+        const messageDiv = document.createElement('div');
+        messageDiv.style.position = 'absolute';
+        messageDiv.style.top = '50%';
+        messageDiv.style.left = '50%';
+        messageDiv.style.transform = 'translate(-50%, -50%)';
+        messageDiv.style.background = 'rgba(0, 0, 0, 0.9)';
+        messageDiv.style.color = 'white';
+        messageDiv.style.padding = '20px';
+        messageDiv.style.borderRadius = '15px';
+        messageDiv.style.fontSize = '18px';
+        messageDiv.style.textAlign = 'center';
+        messageDiv.style.zIndex = '1500';
+        messageDiv.style.border = '3px solid #FFD700';
+        messageDiv.style.boxShadow = '0 0 20px rgba(255, 215, 0, 0.5)';
+        
+        messageDiv.innerHTML = `
+            <div style="font-size: 48px; margin-bottom: 10px;">${bossInfo.emoji}</div>
+            <div style="font-weight: bold; margin-bottom: 10px;">${bossInfo.name}:</div>
+            <div style="font-style: italic; color: #FFD700;">"${bossInfo.quote}"</div>
+            <div style="margin-top: 15px; font-size: 24px;">🍖 Уговорён! Идём на шашлыки! 🔥</div>
+        `;
+        
+        document.querySelector('.game-area').appendChild(messageDiv);
+        
+        // Убираем сообщение через 2 секунды
+        setTimeout(() => {
+            if (messageDiv.parentNode) {
+                messageDiv.parentNode.removeChild(messageDiv);
+            }
+        }, 2000);
     }
     
     takeDamage() {
@@ -369,18 +418,64 @@ class Game {
     }
     
     nextLevel() {
+        console.log(`Переход с уровня ${this.currentLevel} на следующий`);
         this.currentLevel++;
         this.createParticle(this.boss.x, this.boss.y, '🎉');
         
         if (this.currentLevel > this.maxLevel) {
+            console.log("Игра завершена - победа!");
             this.gameState = 'victory';
             document.getElementById('finalScore').textContent = this.score;
             document.getElementById('victoryScreen').classList.remove('hidden');
         } else {
-            setTimeout(() => {
-                this.setupLevel();
-            }, 1000);
+            console.log(`Настройка уровня ${this.currentLevel}`);
+            // Очищаем босса чтобы избежать проблем
+            this.boss = null;
+            this.projectiles = [];
+            
+            // Настраиваем новый уровень
+            this.setupLevel();
+            
+            // Возвращаем состояние игры в playing
+            this.gameState = 'playing';
+            
+            // Показываем уведомление о новом уровне
+            this.showLevelMessage();
         }
+    }
+    
+    showLevelMessage() {
+        const bossInfo = this.bossData[this.currentLevel];
+        
+        // Создаем сообщение о новом уровне
+        const levelDiv = document.createElement('div');
+        levelDiv.style.position = 'absolute';
+        levelDiv.style.top = '30%';
+        levelDiv.style.left = '50%';
+        levelDiv.style.transform = 'translate(-50%, -50%)';
+        levelDiv.style.background = 'rgba(255, 87, 34, 0.95)';
+        levelDiv.style.color = 'white';
+        levelDiv.style.padding = '15px 25px';
+        levelDiv.style.borderRadius = '10px';
+        levelDiv.style.fontSize = '20px';
+        levelDiv.style.textAlign = 'center';
+        levelDiv.style.zIndex = '1500';
+        levelDiv.style.fontWeight = 'bold';
+        levelDiv.style.border = '2px solid white';
+        
+        levelDiv.innerHTML = `
+            <div>🎮 УРОВЕНЬ ${this.currentLevel} 🎮</div>
+            <div style="margin-top: 10px;">Следующий друг: ${bossInfo.emoji} ${bossInfo.name}</div>
+        `;
+        
+        document.querySelector('.game-area').appendChild(levelDiv);
+        
+        // Убираем сообщение через 1.5 секунды
+        setTimeout(() => {
+            if (levelDiv.parentNode) {
+                levelDiv.parentNode.removeChild(levelDiv);
+            }
+        }, 1500);
     }
     
     createParticle(x, y, emoji) {
