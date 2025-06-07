@@ -66,7 +66,6 @@ class Game {
     
     init() {
         this.setupEventListeners();
-        this.setupLevel();
         this.gameLoop();
     }
     
