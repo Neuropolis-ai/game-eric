@@ -15,6 +15,7 @@ class Game {
         this.maxLevel = 4;
         this.score = 0;
         this.health = 3;
+        this.lastUIUpdate = { health: 3, score: 0, level: 1 }; // Для оптимизации UI
         
         // Игровые объекты
         this.player = new Player(100, 300);
@@ -200,13 +201,13 @@ class Game {
         // Создание платформ
         this.createPlatforms();
         
-        // Создание босса
+        // Создание босса - ИСПРАВЛЕНО: правильное позиционирование
         const bossInfo = this.bossData[this.currentLevel];
-        this.boss = new Boss(this.canvas.width - 150, 200, bossInfo);
+        this.boss = new Boss(this.canvas.width - 100, this.canvas.height - 150, bossInfo);
         
         // Сброс позиции игрока
-        this.player.x = 100;
-        this.player.y = 300;
+        this.player.x = 50;
+        this.player.y = this.canvas.height - 150;
         this.player.velocityX = 0;
         this.player.velocityY = 0;
         
@@ -266,8 +267,8 @@ class Game {
         if (this.boss) {
             this.boss.update(this.player);
             
-            // Создание снарядов боссом
-            if (Math.random() < 0.02) {
+            // Создание снарядов боссом - ОПТИМИЗИРОВАНО: реже создаем снаряды
+            if (Math.random() < 0.01 && this.projectiles.length < 3) {
                 this.projectiles.push(new Projectile(
                     this.boss.x, 
                     this.boss.y + 20, 
@@ -359,9 +360,9 @@ class Game {
             this.gameState = 'gameOver';
             document.getElementById('gameOverScreen').classList.remove('hidden');
         } else {
-            // Респавн игрока
-            this.player.x = 100;
-            this.player.y = 300;
+            // Респавн игрока - ИСПРАВЛЕНО: правильная позиция
+            this.player.x = 50;
+            this.player.y = this.canvas.height - 150;
             this.player.velocityX = 0;
             this.player.velocityY = 0;
         }
@@ -383,7 +384,10 @@ class Game {
     }
     
     createParticle(x, y, emoji) {
-        this.particles.push(new Particle(x, y, emoji));
+        // ОПТИМИЗАЦИЯ: ограничиваем количество частиц
+        if (this.particles.length < 10) {
+            this.particles.push(new Particle(x, y, emoji));
+        }
     }
     
     checkCollision(obj1, obj2) {
@@ -394,9 +398,14 @@ class Game {
     }
     
     updateUI() {
-        document.getElementById('lives').textContent = this.health;
-        document.getElementById('score').textContent = this.score;
-        document.getElementById('level').textContent = this.currentLevel;
+        if (this.health !== this.lastUIUpdate.health ||
+            this.score !== this.lastUIUpdate.score ||
+            this.currentLevel !== this.lastUIUpdate.level) {
+            document.getElementById('lives').textContent = this.health;
+            document.getElementById('score').textContent = this.score;
+            document.getElementById('level').textContent = this.currentLevel;
+            this.lastUIUpdate = { health: this.health, score: this.score, level: this.currentLevel };
+        }
     }
     
     render() {
@@ -421,14 +430,22 @@ class Game {
                 this.boss.render(this.ctx);
             }
             
-            // Снаряды
-            this.projectiles.forEach(projectile => projectile.render(this.ctx));
+            // Снаряды - оптимизированный рендеринг
+            this.projectiles.forEach(projectile => {
+                if (projectile.x > -50 && projectile.x < this.canvas.width + 50) {
+                    projectile.render(this.ctx);
+                }
+            });
             
-            // Частицы
-            this.particles.forEach(particle => particle.render(this.ctx));
+            // Частицы - оптимизированный рендеринг
+            this.particles.forEach(particle => {
+                if (particle.life > 0) {
+                    particle.render(this.ctx);
+                }
+            });
             
             // Информация о боссе
-            if (this.boss) {
+            if (this.boss && this.boss.health > 0) {
                 this.renderBossInfo();
             }
         }
