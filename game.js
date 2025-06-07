@@ -6,7 +6,7 @@ class Game {
         this.setupCanvas();
         
         // Игровые переменные
-        this.gameState = 'start'; // start, playing, gameOver, victory
+        this.gameState = 'welcome'; // welcome, playing, gameOver, victory
         this.currentLevel = 1;
         this.maxLevel = 4;
         this.score = 0;
@@ -42,14 +42,26 @@ class Game {
     
     setupCanvas() {
         const resizeCanvas = () => {
-            const container = this.canvas.parentElement;
+            const container = document.getElementById('gameContainer');
             const rect = container.getBoundingClientRect();
+            
+            // Устанавливаем размер канваса равным размеру контейнера
             this.canvas.width = rect.width;
-            this.canvas.height = rect.height - 140; // Вычитаем высоту заголовка и контролов
+            this.canvas.height = rect.height;
+            
+            // Обновляем размеры игры
+            GAME_WIDTH = this.canvas.width;
+            GAME_HEIGHT = this.canvas.height;
+            
+            // Пересчитываем размеры платформ
+            this.updatePlatformSizes();
         };
         
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
+        window.addEventListener('orientationchange', () => {
+            setTimeout(resizeCanvas, 100); // Задержка для корректного обновления
+        });
     }
     
     init() {
@@ -96,14 +108,14 @@ class Game {
         setupMobileControl('attackBtn', 'attack');
         
         // Кнопки экранов
-        document.getElementById('startBtn').addEventListener('click', () => this.startGame());
+        document.getElementById('startGameBtn').addEventListener('click', () => this.startGame());
         document.getElementById('restartBtn').addEventListener('click', () => this.restartGame());
         document.getElementById('playAgainBtn').addEventListener('click', () => this.restartGame());
     }
     
     startGame() {
         this.gameState = 'playing';
-        document.getElementById('startScreen').classList.add('hidden');
+        document.getElementById('welcomeScreen').classList.add('hidden');
         this.setupLevel();
     }
     
@@ -301,6 +313,7 @@ class Game {
         
         if (this.currentLevel > this.maxLevel) {
             this.gameState = 'victory';
+            document.getElementById('finalScore').textContent = this.score;
             document.getElementById('victoryScreen').classList.remove('hidden');
         } else {
             setTimeout(() => {
@@ -321,7 +334,7 @@ class Game {
     }
     
     updateUI() {
-        document.getElementById('health').textContent = this.health;
+        document.getElementById('lives').textContent = this.health;
         document.getElementById('score').textContent = this.score;
         document.getElementById('level').textContent = this.currentLevel;
     }
@@ -385,6 +398,14 @@ class Game {
         this.ctx.font = '16px Arial';
         this.ctx.fillText(`Босс: ${bossInfo.emoji} ${bossInfo.name}`, 20, 30);
         this.ctx.fillText(`Здоровье: ${'❤️'.repeat(this.boss.health)}`, 20, 50);
+    }
+    
+    updatePlatformSizes() {
+        if (this.currentLevel && this.bossData[this.currentLevel]) {
+            this.platforms.forEach(platform => {
+                platform.width = Math.min(platform.width, GAME_WIDTH * 0.3);
+            });
+        }
     }
 }
 

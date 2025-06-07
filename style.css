@@ -6,99 +6,144 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background: linear-gradient(135deg, #ff6b6b, #feca57, #48dbfb);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow-x: hidden;
+    background: linear-gradient(135deg, #ff6b35, #f7931e);
+    color: white;
+    overflow: hidden;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    height: 100vh;
+    width: 100vw;
 }
 
-.game-container {
-    width: 100%;
-    max-width: 800px;
+/* Игровой контейнер */
+#gameContainer {
+    position: relative;
+    width: 100vw;
     height: 100vh;
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border-radius: 20px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
+    max-width: 100%;
+    max-height: 100%;
     overflow: hidden;
 }
 
-.game-header {
-    background: rgba(0, 0, 0, 0.8);
-    color: white;
-    padding: 15px;
-    text-align: center;
-}
-
-.game-header h1 {
-    font-size: 24px;
-    margin-bottom: 10px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.game-info {
-    display: flex;
-    justify-content: space-around;
-    font-size: 18px;
-    font-weight: bold;
-}
-
+/* Canvas */
 #gameCanvas {
-    flex: 1;
-    background: #87CEEB;
     display: block;
-    touch-action: none;
+    background: linear-gradient(to bottom, #87CEEB 0%, #98FB98 100%);
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 
-.mobile-controls {
-    background: rgba(0, 0, 0, 0.8);
+/* UI панель */
+#ui {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 12px;
+    border-radius: 15px;
+    font-size: 16px;
+    font-weight: bold;
+    z-index: 100;
+    flex-wrap: wrap;
+}
+
+.ui-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: fit-content;
+}
+
+/* Мобильные элементы управления */
+#mobileControls {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
     padding: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    background: rgba(0, 0, 0, 0.8);
+    display: none;
+    z-index: 200;
 }
 
-.control-row {
+.control-group {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
+    align-items: flex-end;
+    width: 100%;
     gap: 20px;
 }
 
+.movement-controls {
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+.action-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+}
+
 .control-btn {
-    width: 60px;
-    height: 60px;
-    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    border: 3px solid #333;
     border-radius: 50%;
-    background: linear-gradient(145deg, #667eea, #764ba2);
-    color: white;
+    color: #333;
     font-size: 24px;
+    font-weight: bold;
     cursor: pointer;
     user-select: none;
-    touch-action: manipulation;
-    transition: all 0.2s;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.1s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Размеры кнопок */
+.control-btn.move {
+    width: 60px;
+    height: 60px;
+}
+
+.control-btn.jump {
+    width: 70px;
+    height: 70px;
+    font-size: 28px;
+}
+
+.control-btn.attack {
+    width: 80px;
+    height: 80px;
+    font-size: 32px;
+    background: rgba(255, 107, 53, 0.9);
+    color: white;
+    border-color: #ff4500;
 }
 
 .control-btn:active {
     transform: scale(0.95);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.jump-btn {
-    background: linear-gradient(145deg, #43e97b, #38f9d7);
+.control-btn.pressed {
+    background: rgba(255, 107, 53, 0.8);
+    color: white;
+    transform: scale(0.9);
 }
 
-.attack-btn {
-    background: linear-gradient(145deg, #fa709a, #fee140);
-    width: 80px;
-    height: 60px;
-    border-radius: 30px;
-}
-
+/* Экраны игры */
 .screen {
     position: absolute;
     top: 0;
@@ -106,131 +151,174 @@ body {
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.9);
-    color: white;
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
-    text-align: center;
-    padding: 20px;
+    justify-content: center;
     z-index: 1000;
+    padding: 20px;
+    text-align: center;
 }
 
-.screen.hidden {
-    display: none;
+.screen h1 {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
 }
 
 .screen h2 {
-    font-size: 28px;
-    margin-bottom: 20px;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    font-size: 2em;
+    margin-bottom: 15px;
+    color: #ffeb3b;
 }
 
 .screen p {
-    font-size: 18px;
-    margin-bottom: 15px;
-    line-height: 1.5;
+    font-size: 1.2em;
+    margin-bottom: 10px;
+    line-height: 1.4;
 }
 
-.screen button {
-    background: linear-gradient(145deg, #667eea, #764ba2);
+.victory-quotes {
+    background: rgba(34, 139, 34, 0.2);
+    border: 2px solid #22dd22;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 20px 0;
+    max-width: 90%;
+}
+
+.victory-quotes p {
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+/* Кнопки */
+button {
+    background: linear-gradient(45deg, #ff6b35, #f7931e);
     color: white;
     border: none;
     padding: 15px 30px;
     font-size: 18px;
+    font-weight: bold;
     border-radius: 25px;
     cursor: pointer;
-    margin-top: 20px;
-    transition: all 0.3s;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    margin: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s ease;
 }
 
-.screen button:hover {
+button:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
 }
 
-/* Адаптация для телефонов */
+button:active {
+    transform: translateY(0);
+}
+
+/* Адаптивность */
 @media (max-width: 768px) {
-    .game-container {
-        height: 100vh;
-        border-radius: 0;
-        max-width: 100%;
+    #mobileControls {
+        display: block;
     }
     
-    .game-header h1 {
-        font-size: 20px;
+    #ui {
+        font-size: 14px;
+        padding: 6px 10px;
+        top: 5px;
+        left: 5px;
+        right: 5px;
     }
     
-    .game-info {
+    .screen h1 {
+        font-size: 2em;
+    }
+    
+    .screen h2 {
+        font-size: 1.6em;
+    }
+    
+    .screen p {
+        font-size: 1em;
+    }
+    
+    button {
         font-size: 16px;
+        padding: 12px 24px;
     }
-    
-    .control-btn {
+}
+
+@media (max-height: 600px) {
+    .control-btn.move {
         width: 50px;
         height: 50px;
         font-size: 20px;
     }
     
-    .attack-btn {
-        width: 70px;
-        height: 50px;
-    }
-    
-    .screen h2 {
+    .control-btn.jump {
+        width: 60px;
+        height: 60px;
         font-size: 24px;
     }
     
-    .screen p {
-        font-size: 16px;
+    .control-btn.attack {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
     }
-}
-
-@media (max-width: 480px) {
-    .mobile-controls {
+    
+    #mobileControls {
         padding: 10px;
     }
     
-    .control-row {
-        gap: 15px;
+    .screen h1 {
+        font-size: 1.8em;
+        margin-bottom: 15px;
     }
     
-    .control-btn {
-        width: 45px;
-        height: 45px;
-        font-size: 18px;
+    .screen h2 {
+        font-size: 1.4em;
+        margin-bottom: 10px;
     }
     
-    .attack-btn {
-        width: 65px;
-        height: 45px;
+    .screen p {
+        font-size: 0.9em;
+        margin-bottom: 8px;
     }
+    
+    button {
+        font-size: 14px;
+        padding: 10px 20px;
+        margin: 5px;
+    }
+    
+    .victory-quotes {
+        padding: 15px;
+        margin: 15px 0;
+    }
+}
+
+/* Скрыть экраны по умолчанию */
+.screen.hidden {
+    display: none;
 }
 
 /* Анимации */
 @keyframes bounce {
-    0%, 20%, 60%, 100% {
+    0%, 20%, 53%, 80%, 100% {
         transform: translateY(0);
     }
-    40% {
+    40%, 43% {
         transform: translateY(-30px);
     }
-    80% {
+    70% {
         transform: translateY(-15px);
+    }
+    90% {
+        transform: translateY(-4px);
     }
 }
 
 .bounce {
-    animation: bounce 1s ease-in-out;
-}
-
-/* Скрытие контролов на десктопе */
-@media (min-width: 1024px) {
-    .mobile-controls {
-        display: none;
-    }
-    
-    #gameCanvas {
-        cursor: crosshair;
-    }
+    animation: bounce 2s infinite;
 } 
