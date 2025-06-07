@@ -174,6 +174,9 @@ class Game {
         gameOverScreen.classList.add('hidden');
         victoryScreen.classList.add('hidden');
         
+        // Показываем мобильные кнопки управления
+        this.showMobileControls();
+        
         console.log("Welcome screen classes:", welcomeScreen.classList.toString());
         console.log("Calling setupLevel...");
         this.setupLevel();
@@ -188,8 +191,22 @@ class Game {
         this.player = new Player(100, 300);
         document.getElementById('gameOverScreen').classList.add('hidden');
         document.getElementById('victoryScreen').classList.add('hidden');
+        
+        // Показываем мобильные кнопки управления
+        this.showMobileControls();
+        
         this.setupLevel();
         this.updateUI();
+    }
+    
+    showMobileControls() {
+        const mobileControls = document.getElementById('mobileControls');
+        mobileControls.classList.add('game-active');
+    }
+    
+    hideMobileControls() {
+        const mobileControls = document.getElementById('mobileControls');
+        mobileControls.classList.remove('game-active');
     }
     
     setupLevel() {
@@ -201,9 +218,9 @@ class Game {
         // Создание платформ
         this.createPlatforms();
         
-        // Создание босса - ИСПРАВЛЕНО: правильное позиционирование
+        // Создание босса - ИСПРАВЛЕНО: позиционирование в центре экрана
         const bossInfo = this.bossData[this.currentLevel];
-        this.boss = new Boss(this.canvas.width - 100, this.canvas.height - 150, bossInfo);
+        this.boss = new Boss(this.canvas.width - 120, this.canvas.height / 2 - 25, bossInfo);
         
         // Сброс позиции игрока
         this.player.x = 50;
@@ -360,7 +377,7 @@ class Game {
                 // Задержка перед переходом на следующий уровень
                 setTimeout(() => {
                     this.nextLevel();
-                }, 2000);
+                }, 4000);
             }
         }
     }
@@ -393,12 +410,12 @@ class Game {
         
         document.querySelector('.game-area').appendChild(messageDiv);
         
-        // Убираем сообщение через 2 секунды
+        // Убираем сообщение через 4 секунды
         setTimeout(() => {
             if (messageDiv.parentNode) {
                 messageDiv.parentNode.removeChild(messageDiv);
             }
-        }, 2000);
+        }, 4000);
     }
     
     takeDamage() {
@@ -407,6 +424,8 @@ class Game {
         
         if (this.health <= 0) {
             this.gameState = 'gameOver';
+            // Скрываем мобильные кнопки управления
+            this.hideMobileControls();
             document.getElementById('gameOverScreen').classList.remove('hidden');
         } else {
             // Респавн игрока - ИСПРАВЛЕНО: правильная позиция
@@ -425,6 +444,8 @@ class Game {
         if (this.currentLevel > this.maxLevel) {
             console.log("Игра завершена - победа!");
             this.gameState = 'victory';
+            // Скрываем мобильные кнопки управления
+            this.hideMobileControls();
             document.getElementById('finalScore').textContent = this.score;
             document.getElementById('victoryScreen').classList.remove('hidden');
         } else {

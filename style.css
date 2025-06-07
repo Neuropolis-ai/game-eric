@@ -73,7 +73,7 @@ body {
 
 /* Мобильные элементы управления */
 #mobileControls {
-    display: none;
+    display: none; /* Скрыты по умолчанию */
     position: relative;
     width: 100%;
     padding: 12px 20px;
@@ -84,29 +84,32 @@ body {
     flex-shrink: 0; /* Не сжимаются */
 }
 
+/* Показываем кнопки только когда игра активна */
+#mobileControls.game-active {
+    display: block;
+}
+
 .control-group {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     width: 100%;
-    gap: 25px;
+    gap: 20px;
     height: 80px; /* Уменьшенная высота */
 }
 
 .movement-controls {
     display: flex;
     gap: 15px;
-    align-items: flex-end;
-    flex: 1;
+    align-items: center;
+    /* Убираем flex: 1 чтобы кнопки не растягивались */
 }
 
 .action-controls {
     display: flex;
-    flex-direction: column;
     gap: 15px;
     align-items: center;
-    flex: 1;
-    justify-content: flex-end;
+    /* Убираем flex-direction: column и flex: 1 */
 }
 
 .control-btn {
@@ -129,26 +132,26 @@ body {
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Размеры кнопок - еще более компактные */
+/* Размеры кнопок - все одинакового размера */
 .control-btn.move {
-    width: 60px;
-    height: 60px;
-    font-size: 22px;
+    width: 70px;
+    height: 70px;
+    font-size: 24px;
 }
 
 .control-btn.jump {
     width: 70px;
     height: 70px;
-    font-size: 26px;
+    font-size: 24px;
     background: rgba(76, 175, 80, 0.95);
     color: white;
     border-color: #4CAF50;
 }
 
 .control-btn.attack {
-    width: 75px;
-    height: 75px;
-    font-size: 28px;
+    width: 70px;
+    height: 70px;
+    font-size: 24px;
     background: rgba(255, 87, 34, 0.95);
     color: white;
     border-color: #FF5722;
@@ -259,7 +262,7 @@ button:active {
 
 /* Адаптивность */
 @media (max-width: 768px) {
-    #mobileControls {
+    #mobileControls.game-active {
         display: block;
     }
     
@@ -293,30 +296,30 @@ button:active {
 @media (max-width: 480px) {
     #mobileControls {
         padding: 15px;
-        min-height: 120px;
+        min-height: 100px;
     }
     
     .control-group {
-        gap: 20px;
-        height: 100px;
+        gap: 15px;
+        height: 80px;
     }
     
     .control-btn.move {
-        width: 70px;
-        height: 70px;
-        font-size: 28px;
+        width: 65px;
+        height: 65px;
+        font-size: 22px;
     }
     
     .control-btn.jump {
-        width: 80px;
-        height: 80px;
-        font-size: 32px;
+        width: 65px;
+        height: 65px;
+        font-size: 22px;
     }
     
     .control-btn.attack {
-        width: 90px;
-        height: 90px;
-        font-size: 36px;
+        width: 65px;
+        height: 65px;
+        font-size: 22px;
     }
     
     .movement-controls {
@@ -331,31 +334,31 @@ button:active {
 /* Для очень низких экранов (iPhone в горизонтальном режиме) */
 @media (max-height: 500px) {
     #mobileControls {
-        padding: 10px;
-        min-height: 90px;
+        padding: 8px;
+        min-height: 70px;
     }
     
     .control-group {
-        height: 80px;
-        gap: 15px;
+        height: 60px;
+        gap: 10px;
     }
     
     .control-btn.move {
-        width: 60px;
-        height: 60px;
-        font-size: 24px;
+        width: 55px;
+        height: 55px;
+        font-size: 20px;
     }
     
     .control-btn.jump {
-        width: 70px;
-        height: 70px;
-        font-size: 28px;
+        width: 55px;
+        height: 55px;
+        font-size: 20px;
     }
     
     .control-btn.attack {
-        width: 80px;
-        height: 80px;
-        font-size: 32px;
+        width: 55px;
+        height: 55px;
+        font-size: 20px;
     }
     
     .movement-controls {
@@ -396,21 +399,21 @@ button:active {
 /* Улучшения для очень маленьких экранов */
 @media (max-width: 375px) {
     .control-btn.move {
-        width: 65px;
-        height: 65px;
-        font-size: 26px;
+        width: 60px;
+        height: 60px;
+        font-size: 20px;
     }
     
     .control-btn.jump {
-        width: 75px;
-        height: 75px;
-        font-size: 30px;
+        width: 60px;
+        height: 60px;
+        font-size: 20px;
     }
     
     .control-btn.attack {
-        width: 85px;
-        height: 85px;
-        font-size: 34px;
+        width: 60px;
+        height: 60px;
+        font-size: 20px;
     }
 }
 
