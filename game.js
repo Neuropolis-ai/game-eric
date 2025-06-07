@@ -1,3 +1,7 @@
+// Глобальные переменные размеров игры
+let GAME_WIDTH = 800;
+let GAME_HEIGHT = 600;
+
 // Игра "Эрик зовёт на шашлык"
 class Game {
     constructor() {
@@ -140,18 +144,39 @@ class Game {
             console.log("Start Game button clicked!");
             this.startGame();
         });
-        document.getElementById('restartBtn').addEventListener('click', () => this.restartGame());
-        document.getElementById('playAgainBtn').addEventListener('click', () => this.restartGame());
+        document.getElementById('restartBtn').addEventListener('click', () => {
+            console.log("Restart button clicked!");
+            this.restartGame();
+        });
+        document.getElementById('playAgainBtn').addEventListener('click', () => {
+            console.log("Play Again button clicked!");
+            this.restartGame();
+        });
     }
     
     startGame() {
-        if (this.gameState === 'playing') return;
+        console.log("StartGame method called, current gameState:", this.gameState);
+        if (this.gameState === 'playing') {
+            console.log("Game already playing, returning");
+            return;
+        }
         console.log("Starting game...");
         this.gameState = 'playing';
-        document.getElementById('welcomeScreen').classList.add('hidden');
-        document.getElementById('gameOverScreen').classList.add('hidden');
-        document.getElementById('victoryScreen').classList.add('hidden');
+        console.log("Set gameState to:", this.gameState);
+        
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const gameOverScreen = document.getElementById('gameOverScreen');
+        const victoryScreen = document.getElementById('victoryScreen');
+        
+        console.log("Hiding screens...");
+        welcomeScreen.classList.add('hidden');
+        gameOverScreen.classList.add('hidden');
+        victoryScreen.classList.add('hidden');
+        
+        console.log("Welcome screen classes:", welcomeScreen.classList.toString());
+        console.log("Calling setupLevel...");
         this.setupLevel();
+        console.log("Game started successfully!");
     }
     
     restartGame() {
@@ -506,7 +531,7 @@ class Player {
         });
         
         // Границы экрана
-        this.x = Math.max(0, Math.min(this.x, window.innerWidth - this.width));
+        this.x = Math.max(0, Math.min(this.x, GAME_WIDTH - this.width));
         
         // Атака
         if (this.attackCooldown > 0) {
@@ -559,7 +584,7 @@ class Boss {
         }
         
         this.x += this.moveDirection * 1;
-        this.x = Math.max(0, Math.min(this.x, window.innerWidth - this.width));
+        this.x = Math.max(0, Math.min(this.x, GAME_WIDTH - this.width));
     }
     
     takeDamage() {
