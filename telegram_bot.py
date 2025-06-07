@@ -32,7 +32,7 @@ BOT_TOKEN = "7635542013:AAF3pKAC1Icnaf46_qIRlNlF6I48Rojlmf8"  # Ваш токе�
 WEBHOOK_HOST = "https://your-domain.com"  # Ваш домен (для продакшена)
 WEBHOOK_PATH = "/webhook"
 WEBHOOK_URL = f"{WEBHOOK_HOST}{WEBHOOK_PATH}"
-GAME_URL = "http://localhost:8000"  # URL вашей игры (локально на порту 8000)
+GAME_URL = "https://neuropolis-ai.github.io/game-eric/"  # GitHub Pages URL (HTTPS для Telegram Web App)
 WEBAPP_PORT = 8443
 
 # Флаг для локального тестирования
