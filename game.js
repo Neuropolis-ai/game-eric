@@ -84,22 +84,51 @@ class Game {
         // Мобильные контролы
         const setupMobileControl = (id, action) => {
             const btn = document.getElementById(id);
+            
             btn.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 this.mobileControls[action] = true;
+                btn.classList.add('pressed');
+                
+                // Тактильная обратная связь для iOS
+                if (navigator.vibrate) {
+                    navigator.vibrate(50);
+                }
             });
+            
             btn.addEventListener('touchend', (e) => {
                 e.preventDefault();
                 this.mobileControls[action] = false;
+                btn.classList.remove('pressed');
             });
+            
+            btn.addEventListener('touchcancel', (e) => {
+                e.preventDefault();
+                this.mobileControls[action] = false;
+                btn.classList.remove('pressed');
+            });
+            
             btn.addEventListener('mousedown', (e) => {
                 e.preventDefault();
                 this.mobileControls[action] = true;
+                btn.classList.add('pressed');
             });
+            
             btn.addEventListener('mouseup', (e) => {
                 e.preventDefault();
                 this.mobileControls[action] = false;
+                btn.classList.remove('pressed');
             });
+            
+            btn.addEventListener('mouseleave', (e) => {
+                e.preventDefault();
+                this.mobileControls[action] = false;
+                btn.classList.remove('pressed');
+            });
+            
+            // Предотвращаем выделение текста
+            btn.addEventListener('selectstart', (e) => e.preventDefault());
+            btn.addEventListener('dragstart', (e) => e.preventDefault());
         };
         
         setupMobileControl('leftBtn', 'left');

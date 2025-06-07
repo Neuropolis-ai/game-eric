@@ -66,10 +66,11 @@ body {
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 15px;
+    padding: 20px;
     background: rgba(0, 0, 0, 0.8);
     display: none;
     z-index: 200;
+    min-height: 140px;
 }
 
 .control-group {
@@ -77,28 +78,32 @@ body {
     justify-content: space-between;
     align-items: flex-end;
     width: 100%;
-    gap: 20px;
+    gap: 30px;
+    height: 120px;
 }
 
 .movement-controls {
     display: flex;
-    gap: 10px;
+    gap: 15px;
     align-items: flex-end;
+    flex: 1;
 }
 
 .action-controls {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
     align-items: center;
+    flex: 1;
+    justify-content: flex-end;
 }
 
 .control-btn {
-    background: rgba(255, 255, 255, 0.9);
-    border: 3px solid #333;
+    background: rgba(255, 255, 255, 0.95);
+    border: 4px solid #333;
     border-radius: 50%;
     color: #333;
-    font-size: 24px;
+    font-size: 28px;
     font-weight: bold;
     cursor: pointer;
     user-select: none;
@@ -107,40 +112,65 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.1s ease;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transition: all 0.15s ease;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-/* Размеры кнопок */
+/* Размеры кнопок - увеличенные для iPhone */
 .control-btn.move {
-    width: 60px;
-    height: 60px;
-}
-
-.control-btn.jump {
-    width: 70px;
-    height: 70px;
-    font-size: 28px;
-}
-
-.control-btn.attack {
     width: 80px;
     height: 80px;
     font-size: 32px;
-    background: rgba(255, 107, 53, 0.9);
+}
+
+.control-btn.jump {
+    width: 90px;
+    height: 90px;
+    font-size: 36px;
+    background: rgba(76, 175, 80, 0.95);
     color: white;
-    border-color: #ff4500;
+    border-color: #4CAF50;
+}
+
+.control-btn.attack {
+    width: 100px;
+    height: 100px;
+    font-size: 40px;
+    background: rgba(255, 87, 34, 0.95);
+    color: white;
+    border-color: #FF5722;
+    box-shadow: 0 8px 16px rgba(255, 87, 34, 0.4);
 }
 
 .control-btn:active {
-    transform: scale(0.95);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    transform: scale(0.92);
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.4);
 }
 
 .control-btn.pressed {
-    background: rgba(255, 107, 53, 0.8);
+    background: rgba(255, 193, 7, 0.95);
+    color: #333;
+    transform: scale(0.88);
+    border-color: #FFC107;
+}
+
+.control-btn.move:active {
+    background: rgba(33, 150, 243, 0.95);
     color: white;
-    transform: scale(0.9);
+    border-color: #2196F3;
+}
+
+.control-btn.jump:active {
+    background: rgba(56, 142, 60, 0.95);
+    transform: scale(0.92);
+}
+
+.control-btn.attack:active {
+    background: rgba(244, 67, 54, 0.95);
+    transform: scale(0.92);
+    box-shadow: 0 4px 8px rgba(244, 67, 54, 0.6);
 }
 
 /* Экраны игры */
@@ -248,29 +278,132 @@ button:active {
     }
 }
 
-@media (max-height: 600px) {
+/* Специально для iPhone и маленьких экранов */
+@media (max-width: 480px) {
+    #mobileControls {
+        padding: 15px;
+        min-height: 120px;
+    }
+    
+    .control-group {
+        gap: 20px;
+        height: 100px;
+    }
+    
     .control-btn.move {
-        width: 50px;
-        height: 50px;
-        font-size: 20px;
-    }
-    
-    .control-btn.jump {
-        width: 60px;
-        height: 60px;
-        font-size: 24px;
-    }
-    
-    .control-btn.attack {
         width: 70px;
         height: 70px;
         font-size: 28px;
     }
     
-    #mobileControls {
-        padding: 10px;
+    .control-btn.jump {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
     }
     
+    .control-btn.attack {
+        width: 90px;
+        height: 90px;
+        font-size: 36px;
+    }
+    
+    .movement-controls {
+        gap: 12px;
+    }
+    
+    .action-controls {
+        gap: 12px;
+    }
+}
+
+/* Для очень низких экранов (iPhone в горизонтальном режиме) */
+@media (max-height: 500px) {
+    #mobileControls {
+        padding: 10px;
+        min-height: 90px;
+    }
+    
+    .control-group {
+        height: 80px;
+        gap: 15px;
+    }
+    
+    .control-btn.move {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+    }
+    
+    .control-btn.jump {
+        width: 70px;
+        height: 70px;
+        font-size: 28px;
+    }
+    
+    .control-btn.attack {
+        width: 80px;
+        height: 80px;
+        font-size: 32px;
+    }
+    
+    .movement-controls {
+        gap: 8px;
+    }
+    
+    .action-controls {
+        gap: 8px;
+    }
+    
+    .screen h1 {
+        font-size: 1.6em;
+        margin-bottom: 12px;
+    }
+    
+    .screen h2 {
+        font-size: 1.3em;
+        margin-bottom: 8px;
+    }
+    
+    .screen p {
+        font-size: 0.85em;
+        margin-bottom: 6px;
+    }
+    
+    button {
+        font-size: 14px;
+        padding: 8px 16px;
+        margin: 3px;
+    }
+    
+    .victory-quotes {
+        padding: 10px;
+        margin: 10px 0;
+    }
+}
+
+/* Улучшения для очень маленьких экранов */
+@media (max-width: 375px) {
+    .control-btn.move {
+        width: 65px;
+        height: 65px;
+        font-size: 26px;
+    }
+    
+    .control-btn.jump {
+        width: 75px;
+        height: 75px;
+        font-size: 30px;
+    }
+    
+    .control-btn.attack {
+        width: 85px;
+        height: 85px;
+        font-size: 34px;
+    }
+}
+
+@media (max-height: 600px) {
     .screen h1 {
         font-size: 1.8em;
         margin-bottom: 15px;
